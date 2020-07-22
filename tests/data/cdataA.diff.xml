@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<diff>
+  <replace sel="/a/text()[2]"><![CDATA[111]]></replace>
+</diff>

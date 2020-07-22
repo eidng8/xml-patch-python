@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <replace sel="comment()"><!--
+     This file is derived from a file included in the Amaya
+     documentation and was obtained by downloading and
+     unpacking the Amaya 4.1 source release from:
+       http://www.w3.org/Amaya
+
+     The overall manual which this file forms a part is:
+       Copyright 2000 W3C (MIT, INRIA, Keio), All Rights Reserved
+     and is provided under the following terms:
+       http://www.w3.org/Consortium/Legal/copyright-documents-19990405
+--></replace>
+  <replace sel="/html/body/div/ul[1]/li[4]/text()[1]">An unfilled circle,
+  </replace>
+  <replace sel="/html/body/div/ul[1]/li[4]/*[namespace-uri()='http://www.w3.org/2000/svg'][local-name()='svg']/*[namespace-uri()='http://www.w3.org/2000/svg'][local-name()='circle']/@style"
+  >stroke: #FF0000; stroke-width: 2px</replace>
+</diff>
