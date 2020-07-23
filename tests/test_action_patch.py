@@ -59,10 +59,29 @@ class TestActionReplace(unittest.TestCase):
         action = ActionReplace(patch, src.xpath('/a/b'))
         self.assertRaises(UnlocatedNode, action.apply)
 
-    def test_apply_non_element_replacement_should_throw_error(self):
+    def test_invalid_target_should_throw_error(self):
+        patch = etree.fromstring('<replace sel="/a/b"><c>w</c></replace>')
+        action = ActionReplace(patch, 'abc')
+        self.assertRaises(UnlocatedNode, action.apply)
+        action = ActionReplace(patch, {})
+        self.assertRaises(UnlocatedNode, action.apply)
+
+    def test_replace_element_with_text_should_throw_error(self):
         src = etree.fromstring('<a><b>y</b></a>')
         patch = etree.fromstring('<replace sel="/a/b">w</replace>')
         action = ActionReplace(patch, src.getchildren()[0])
+        self.assertRaises(InvalidNodeTypes, action.apply)
+
+    def test_replace_text_with_element_should_throw_error(self):
+        src = etree.fromstring('<a>y</a>')
+        patch = etree.fromstring('<replace sel="/a/text()"><b/></replace>')
+        action = ActionReplace(patch, src.xpath('/a/text()'))
+        self.assertRaises(InvalidNodeTypes, action.apply)
+
+    def test_replace_attribute_with_element_should_throw_error(self):
+        src = etree.fromstring('<a attr="abc"></a>')
+        patch = etree.fromstring('<replace sel="/a/@attr"><b/></replace>')
+        action = ActionReplace(patch, src.xpath('/a/@attr'))
         self.assertRaises(InvalidNodeTypes, action.apply)
 
 

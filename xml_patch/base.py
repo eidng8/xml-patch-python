@@ -23,4 +23,7 @@ class Base:
         elif isinstance(self._target, str):
             info(f'target={self._target}')
         else:
-            info(f'target={etree.tostring(self._target)}')
+            if etree.iselement(self._target):
+                info(f'target={etree.tostring(self._target)}')
+            else:
+                info(f'target={self._target}')

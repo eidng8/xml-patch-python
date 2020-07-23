@@ -1,4 +1,5 @@
 from lxml import etree
+
 from xml_patch.base import Base
 from xml_patch.exceptions.invalid_patch_directive import InvalidPatchDirective
 from xml_patch.exceptions.invalid_node_types import InvalidNodeTypes
@@ -22,15 +23,15 @@ class ActionReplace(Base):
         """Apply the given replace action on only one target"""
         self._info(ActionReplace._apply)
         if isinstance(self._target, str):
-            if self._target.is_attribute:
+            if hasattr(self._target, 'is_attribute') and self._target.is_attribute:
                 self._handle_attribute()
-            elif self._target.is_text:
+            elif hasattr(self._target, 'is_text') and self._target.is_text:
                 self._handle_text()
-            else:  # pragma: no cover
+            else:
                 raise UnlocatedNode(self._action, 'Invalid target')
         elif etree.iselement(self._target):
             self._handle_element()
-        else:   # pragma: no cover
+        else:
             raise UnlocatedNode(self._action, 'Invalid target')
 
     def _handle_element(self):
@@ -61,6 +62,6 @@ class ActionReplace(Base):
         self._guard_text_action()
         self._target.getparent().text = self._action.text
 
-    def _guard_text_action(self):  # pragma: no cover
+    def _guard_text_action(self):
         if self._action.getchildren():
             raise InvalidNodeTypes(self._action)
