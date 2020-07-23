@@ -12,7 +12,7 @@ class ActionReplace(Base):
         """Apply the given replace action on target"""
         self._info(ActionReplace.apply)
         if isinstance(self._target, list):
-            if 1 == len(self._target):  # pragma: no cover
+            if 1 == len(self._target):
                 self._target = self._target[0]
             else:
                 raise UnlocatedNode(self._action)
@@ -26,20 +26,21 @@ class ActionReplace(Base):
                 self._handle_attribute()
             elif self._target.is_text:
                 self._handle_text()
-            else:
+            else:  # pragma: no cover
                 raise UnlocatedNode(self._action, 'Invalid target')
         elif etree.iselement(self._target):
             self._handle_element()
-        else:
+        else:   # pragma: no cover
             raise UnlocatedNode(self._action, 'Invalid target')
 
     def _handle_element(self):
         """Apply the given replace action on target element"""
         self._info(ActionReplace._handle_element)
-        # number of children has been restricted in schema
-        replacement = self._action.getchildren()[0]
-        if not etree.iselement(replacement):
+        # number of child elements has been restricted by schema
+        replacement = self._action.getchildren()
+        if not replacement:
             raise InvalidNodeTypes(self._action)
+        replacement = replacement[0]
         if self._target.tail:
             replacement.tail = self._target.tail
         self._target.getparent().replace(self._target, replacement)
@@ -60,6 +61,6 @@ class ActionReplace(Base):
         self._guard_text_action()
         self._target.getparent().text = self._action.text
 
-    def _guard_text_action(self):
+    def _guard_text_action(self):  # pragma: no cover
         if self._action.getchildren():
             raise InvalidNodeTypes(self._action)
