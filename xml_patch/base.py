@@ -12,4 +12,15 @@ class Base:
     def _info(self, method):
         info(method.__doc__)
         info(f'action={etree.tostring(self._action)}')
-        info(f'target={etree.tostring(self._target)}')
+        if isinstance(self._target, list):
+            info('target=[')
+            for elem in self._target:
+                if etree.iselement(elem):
+                    info(etree.tostring(elem))
+                else:
+                    info(f'"{elem}"')
+            info(']')
+        elif isinstance(self._target, str):
+            info(f'target={self._target}')
+        else:
+            info(f'target={etree.tostring(self._target)}')
