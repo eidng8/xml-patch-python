@@ -1,0 +1,8 @@
+[run]
+branch = yes
+source = xml_patch
+
+[report]
+skip_covered = yes
+show_missing = yes
+skip_empty = yes

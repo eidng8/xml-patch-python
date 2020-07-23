@@ -1,13 +1,12 @@
-from logging import info
 from lxml import etree
+from xml_patch.base import Base
+from xml_patch.exceptions.invalid_patch_directive import InvalidPatchDirective
+from xml_patch.exceptions.invalid_node_types import InvalidNodeTypes
+from xml_patch.exceptions.unlocated_node import UnlocatedNode
 
 
-class ActionReplace:
+class ActionReplace(Base):
     """Handles the `<replace>` action."""
-
-    def __init__(self, action: etree.Element, target):
-        self._action: etree.Element = action
-        self._target = target
 
     def apply(self):
         """Apply the given replace action on target"""
@@ -17,23 +16,25 @@ class ActionReplace:
                 self._target = self._target[0]
                 self.handle_element()
             else:
-                raise Exception('cannot be list')
+                raise UnlocatedNode(self._action)
         elif isinstance(self._target, str):
             if self._target.is_attribute:
                 self.handle_attribute()
             elif self._target.is_text:
                 self.handle_text()
             else:
-                raise Exception('unsupported data type', self._target)
+                raise UnlocatedNode(self._action, 'Invalid target')
         elif etree.iselement(self._target):
             self.handle_element()
         else:
-            raise Exception('unsupported data type', self._target)
+            raise UnlocatedNode(self._action, 'Invalid target')
 
     def handle_element(self):
         """Apply the given replace action on target element"""
         self._info(ActionReplace.handle_element)
-        replacement: etree.Element = self._action.getchildren()[0]
+        replacement = self._action.getchildren()[0]
+        if not etree.iselement(replacement):
+            raise InvalidNodeTypes(self._action)
         if self._target.tail:
             replacement.tail = self._target.tail
         self._target.getparent().replace(self._target, replacement)
@@ -41,12 +42,16 @@ class ActionReplace:
     def handle_attribute(self):
         """Apply the given replace action on target attribute"""
         self._info(ActionReplace.handle_attribute)
+        replacement = self._action.getchildren()[0]
+        if not isinstance(replacement, str):
+            raise InvalidNodeTypes(self._action)
+        attr_name = self._action['sel'][self._action.find('@'):]
+        self._target.getparent()[attr_name] = replacement
 
     def handle_text(self):
         """Apply the given replace action on target text content"""
         self._info(ActionReplace.handle_text)
-
-    def _info(self, method):
-        info(method.__doc__)
-        info(f'action={etree.tostring(self._action)}')
-        info(f'target={etree.tostring(self._target)}')
+        replacement = self._action.getchildren()[0]
+        if not isinstance(replacement, str):
+            raise InvalidNodeTypes(self._action)
+        self._target.getparent().text = replacement
