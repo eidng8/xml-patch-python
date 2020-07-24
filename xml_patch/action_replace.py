@@ -1,13 +1,32 @@
 from lxml import etree
 
 from xml_patch.base import Base
-from xml_patch.exceptions.invalid_patch_directive import InvalidPatchDirective
 from xml_patch.exceptions.invalid_node_types import InvalidNodeTypes
+from xml_patch.exceptions.invalid_patch_directive import InvalidPatchDirective
 from xml_patch.exceptions.unlocated_node import UnlocatedNode
+from xml_patch.utils import is_attribute_node, is_text_node, has_no_child_element
 
 
 class ActionReplace(Base):
-    """Handles the `<replace>` action."""
+    """Handles the `<replace>` directive (action).
+
+    RFC document exerpt:
+    ------
+
+    4.4.  &lt;replace&gt; Element
+    ======
+    The <replace> element represents a replacement operation: for
+    example, an existing element is updated with a new element or an
+    attribute value is replaced with a new value.  This <replace>
+    operation always updates a single node or node content at a time.
+
+    The <replace> element type only has a 'sel' attribute.  If the
+    located target node is an element, a comment or a processing
+    instruction, then the child of the <replace> element MUST also be of
+    the same type.  Otherwise, the <replace> element MUST have text
+    content or it MAY be empty when replacing an attribute value or a
+    text node content.
+    """
 
     def apply(self):
         """Apply the given replace action on target"""
@@ -23,9 +42,9 @@ class ActionReplace(Base):
         """Apply the given replace action on only one target"""
         self._info(ActionReplace._apply)
         if isinstance(self._target, str):
-            if hasattr(self._target, 'is_attribute') and self._target.is_attribute:
+            if is_attribute_node(self._target):
                 self._handle_attribute()
-            elif hasattr(self._target, 'is_text') and self._target.is_text:
+            elif is_text_node(self._target):
                 self._handle_text()
             else:
                 raise UnlocatedNode(self._action, 'Invalid target')
@@ -63,5 +82,5 @@ class ActionReplace(Base):
         self._target.getparent().text = self._action.text
 
     def _guard_text_action(self):
-        if self._action.getchildren():
+        if not has_no_child_element(self._action):
             raise InvalidNodeTypes(self._action)

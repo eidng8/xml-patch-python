@@ -7,7 +7,8 @@ from xml_patch.action_replace import ActionReplace
 
 
 class Patch:
-    """Handles RFC-5261 XML patch operations.
+    """Handles [RFC-5261](https://tools.ietf.org/html/rfc5261) XML patch operations.
+
     Properties
     ----------
     source : str
