@@ -4,7 +4,7 @@ from xml_patch.base import Base
 from xml_patch.exceptions.invalid_node_types import InvalidNodeTypes
 from xml_patch.exceptions.invalid_patch_directive import InvalidPatchDirective
 from xml_patch.exceptions.unlocated_node import UnlocatedNode
-from xml_patch.utils import is_attribute_node, is_text_node, has_no_child_element
+from xml_patch.utils import is_attribute_node, is_text_node
 
 
 class ActionReplace(Base):
@@ -80,7 +80,3 @@ class ActionReplace(Base):
         self._info(ActionReplace._handle_text)
         self._guard_text_action()
         self._target.getparent().text = self._action.text
-
-    def _guard_text_action(self):
-        if not has_no_child_element(self._action):
-            raise InvalidNodeTypes(self._action)

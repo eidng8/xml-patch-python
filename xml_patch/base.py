@@ -1,6 +1,9 @@
 from logging import info
 from lxml import etree
 
+from xml_patch.utils import is_attribute_node, is_text_node, has_no_child_element
+from xml_patch.exceptions.invalid_node_types import InvalidNodeTypes
+
 
 class Base:
     """Base class for all others."""
@@ -27,3 +30,7 @@ class Base:
                 info(f'target={etree.tostring(self._target)}')
             else:
                 info(f'target={self._target}')
+
+    def _guard_text_action(self):
+        if not has_no_child_element(self._action):
+            raise InvalidNodeTypes(self._action)
