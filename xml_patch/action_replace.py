@@ -13,17 +13,17 @@ class ActionReplace(Base):
     RFC document exerpt:
     ------
 
-    4.4.  &lt;replace&gt; Element
+    4.4.  `<replace>` Element
     ======
-    The <replace> element represents a replacement operation: for
+    The `<replace>` element represents a replacement operation: for
     example, an existing element is updated with a new element or an
-    attribute value is replaced with a new value.  This <replace>
+    attribute value is replaced with a new value.  This `<replace>`
     operation always updates a single node or node content at a time.
 
-    The <replace> element type only has a 'sel' attribute.  If the
+    The `<replace>` element type only has a 'sel' attribute.  If the
     located target node is an element, a comment or a processing
-    instruction, then the child of the <replace> element MUST also be of
-    the same type.  Otherwise, the <replace> element MUST have text
+    instruction, then the child of the `<replace>` element MUST also be of
+    the same type.  Otherwise, the `<replace>` element MUST have text
     content or it MAY be empty when replacing an attribute value or a
     text node content.
     """
