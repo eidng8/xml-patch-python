@@ -34,3 +34,6 @@ class Base:
     def _guard_text_action(self):
         if not has_no_child_element(self._action):
             raise InvalidNodeTypes(self._action)
+
+    def _is_empty_element(self) -> bool:
+        return False

@@ -80,3 +80,9 @@ class ActionReplace(Base):
         self._info(ActionReplace._handle_text)
         self._guard_text_action()
         self._target.getparent().text = self._action.text
+
+    def _handle_comment(self):
+        return
+
+    def _handle_instruction(self):
+        return
