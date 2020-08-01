@@ -1,5 +1,8 @@
+#  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
+#
+#  Author: eidng8
+
 import unittest
-from os import path
 
 from lxml import etree
 
@@ -47,6 +50,33 @@ class TestActionReplace(unittest.TestCase):
         actual = etree.tostring(src)
         self.assertEqual(actual, b'<a>cba</a>')
 
+    def test_apply_comment(self):
+        src = etree.fromstring('<a><!-- a comment --></a>')
+        patch = etree.fromstring(
+            '<replace sel="/a/comment()"><!--a replacement--></replace>')
+        ActionReplace(patch, src.xpath('/a/comment()')).apply()
+        actual = etree.tostring(src)
+        self.assertEqual(actual, b'<a><!--a replacement--></a>')
+
+    def test_apply_instruction(self):
+        src = etree.fromstring('<a><?b?></a>')
+        patch = etree.fromstring(
+            '<replace sel="/a/processing-instruction(\'b\')"><?c?></replace>')
+        ActionReplace(patch,
+                      src.xpath('/a/processing-instruction(\'b\')')).apply()
+        actual = etree.tostring(src)
+        self.assertEqual(actual, b'<a><?c?></a>')
+
+    # def test_apply_cdata(self):
+    #     parser = etree.XMLParser(strip_cdata=False)
+    #     src = etree.fromstring('<a><![CDATA[b]]></a>', parser=parser)
+    #     patch = etree.fromstring(
+    #         '<replace sel="/a/text()"><![CDATA[<c>]]></replace>',
+    #         parser=parser)
+    #     ActionReplace(patch, src.xpath('/a/text()')).apply()
+    #     actual = etree.tostring(src)
+    #     self.assertEqual(actual, b'<a><![CDATA[<c>]]></a>')
+
     def test_no_target_should_throw_error(self):
         src = etree.fromstring('<a><b/><b/></a>')
         patch = etree.fromstring('<replace sel="/a/c"><c>w</c></replace>')
@@ -76,6 +106,21 @@ class TestActionReplace(unittest.TestCase):
         src = etree.fromstring('<a>y</a>')
         patch = etree.fromstring('<replace sel="/a/text()"><b/></replace>')
         action = ActionReplace(patch, src.xpath('/a/text()'))
+        self.assertRaises(InvalidNodeTypes, action.apply)
+
+    def test_replace_comment_with_element_should_throw_error(self):
+        src = etree.fromstring('<a><!-- a comment --></a>')
+        patch = etree.fromstring(
+            '<replace sel="/a/comment()"><b/></replace>')
+        action = ActionReplace(patch, src.xpath('/a/comment()'))
+        self.assertRaises(InvalidNodeTypes, action.apply)
+
+    def test_replace_instruction_with_element_should_throw_error(self):
+        src = etree.fromstring('<a><?b?></a>')
+        patch = etree.fromstring(
+            '<replace sel="/a/processing-instruction(\'b\')"><b/></replace>')
+        action = ActionReplace(patch,
+                               src.xpath('/a/processing-instruction(\'b\')'))
         self.assertRaises(InvalidNodeTypes, action.apply)
 
     def test_replace_attribute_with_element_should_throw_error(self):

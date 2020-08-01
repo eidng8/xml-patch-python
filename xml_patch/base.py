@@ -1,8 +1,13 @@
+#  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
+#
+#  Author: eidng8
+
 from logging import info
+
 from lxml import etree
 
-from xml_patch.utils import is_attribute_node, is_text_node, has_no_child_element
 from xml_patch.exceptions.invalid_node_types import InvalidNodeTypes
+from xml_patch.utils import has_no_child_element
 
 
 class Base:
@@ -34,6 +39,3 @@ class Base:
     def _guard_text_action(self):
         if not has_no_child_element(self._action):
             raise InvalidNodeTypes(self._action)
-
-    def _is_empty_element(self) -> bool:
-        return False

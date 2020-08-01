@@ -1,13 +1,21 @@
+#  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
+#
+#  Author: eidng8
+
 from copy import deepcopy
 from logging import info
-from lxml import etree
 from os import path
+
+from lxml import etree
 
 from xml_patch.action_replace import ActionReplace
 
 
 class Patch:
-    """Handles [RFC-5261](https://tools.ietf.org/html/rfc5261) XML patch operations.
+    """Handles [RFC-5261](https://tools.ietf.org/html/rfc5261) XML patch
+     operations.
+     Please note that `CDATA` if present, are treated as plain text nodes,
+     with only their contents.
 
     Properties
     ----------
@@ -23,7 +31,8 @@ class Patch:
         The patched (output) XML document.
     """
 
-    def __init__(self, diff_path: str, src_path: str, keep_source: bool = False):
+    def __init__(self, diff_path: str, src_path: str,
+                 keep_source: bool = False):
         """
         Parameters
         ----------
@@ -39,7 +48,9 @@ class Patch:
         self._patched: etree.ElementTree = deepcopy(
             self._source) if keep_source else self._source
         xsd = path.join(path.abspath(path.dirname(__file__)), 'diff.xsd')
-        parser = etree.XMLParser(schema=etree.XMLSchema(file=xsd))
+        parser = etree.XMLParser(schema=etree.XMLSchema(file=xsd),
+                                 remove_pis=False, remove_comments=False,
+                                 strip_cdata=False)
         self._diff: etree.ElementTree = etree.parse(diff_path, parser=parser)
 
     @property
@@ -47,7 +58,7 @@ class Patch:
         return self._source
 
     @property
-    def diff(self) -> str:
+    def diff(self) -> etree.ElementTree:
         return self._diff
 
     @property
